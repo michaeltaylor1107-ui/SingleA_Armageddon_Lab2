@@ -1,0 +1,259 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Italic;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\i\fs26 \cf0 #!/bin/bash
+\f1\i0 \
+
+\f0\i # =============================================================================
+\f1\i0 \
+
+\f0\i # Lab 2: EC2 Startup Script (User Data Automation)
+\f1\i0 \
+
+\f0\i # Author: rajiv henry
+\f1\i0 \
+
+\f0\i # Purpose: Automatically configure an EC2 instance to host a static website
+\f1\i0 \
+
+\f0\i # Web Server: Apache (httpd)
+\f1\i0 \
+
+\f0\i # =============================================================================
+\f1\i0 \
+\
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+
+\f0\i # STEP 1: System Update
+\f1\i0 \
+
+\f0\i # Ensures all packages are current before installing new software
+\f1\i0 \
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+yum update -y\
+\
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+
+\f0\i # STEP 2: Install Apache Web Server
+\f1\i0 \
+
+\f0\i # httpd is the Apache package name on Amazon Linux
+\f1\i0 \
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+yum install -y httpd\
+\
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+
+\f0\i # STEP 3: Start Apache and Enable Auto-Start on Boot
+\f1\i0 \
+
+\f0\i # systemctl start  \uc0\u8594  starts the service immediately
+\f1\i0 \
+
+\f0\i # systemctl enable \uc0\u8594  ensures it starts automatically after reboot
+\f1\i0 \
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+systemctl start httpd\
+systemctl enable httpd\
+\
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+
+\f0\i # STEP 4: Create the HTML Web Page
+\f1\i0 \
+
+\f0\i # This writes a complete HTML file with inline CSS to the Apache web root
+\f1\i0 \
+
+\f0\i # The page includes: name, background image, embedded image, and 3 sections
+\f1\i0 \
+
+\f0\i # -----------------------------------------------------------------------------
+\f1\i0 \
+cat << EOF > /var/www/html/index.html\
+<!DOCTYPE html>\
+<html lang="en">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>rajiv henry | EC2 Static Site</title>\
+    <style>\
+        /* ===== GLOBAL STYLES ===== */\
+        * \{\
+            margin: 0;\
+            padding: 0;\
+            box-sizing: border-box;\
+        \} \
+\
+        body \{\
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\
+            line-height: 1.8;\
+            color: #f0f0f0;\
+            background-image: url('https://images.unsplash.com/photo-1764366795867-a0e7fcbf791e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');\
+            background-size: cover;\
+            background-position: center;\
+            background-attachment: fixed;\
+            background-repeat: no-repeat;\
+            min-height: 100vh;\
+        \}\
+\
+        /* ===== OVERLAY FOR READABILITY ===== */\
+        .overlay \{\
+            background-color: rgba(0, 0, 0, 0.7);\
+            min-height: 100vh;\
+            padding: 40px 20px;\
+        \}\
+\
+        /* ===== CONTAINER ===== */\
+        .container \{\
+            max-width: 900px;\
+            margin: 0 auto;\
+        \}\
+\
+        /* ===== HEADER ===== */\
+        header \{\
+            text-align: center;\
+            padding: 40px 0;\
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);\
+            margin-bottom: 40px;\
+        \}\
+\
+        header h1 \{\
+            font-size: 3rem;\
+            color: #00d4ff;\
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);\
+            margin-bottom: 10px;\
+        \}\
+\
+        header p \{\
+            font-size: 1.2rem;\
+            color: #b0b0b0;\
+            font-style: italic;\
+        \}\
+\
+        /* ===== CONTENT SECTIONS ===== */\
+        .section \{\
+            background-color: rgba(255, 255, 255, 0.1);\
+            border-radius: 12px;\
+            padding: 30px;\
+            margin-bottom: 30px;\
+            backdrop-filter: blur(5px);\
+            border: 1px solid rgba(255, 255, 255, 0.1);\
+        \}\
+\
+        .section h2 \{\
+            color: #00d4ff;\
+            font-size: 1.8rem;\
+            margin-bottom: 15px;\
+            border-left: 4px solid #00d4ff;\
+            padding-left: 15px;\
+        \}\
+\
+        .section p \{\
+            font-size: 1.1rem;\
+            color: #e0e0e0;\
+        \}\
+\
+        /* ===== EMBEDDED IMAGE ===== */\
+        .image-container \{\
+            text-align: center;\
+            margin: 30px 0;\
+        \}\
+\
+        .image-container img \{\
+            max-width: 100%;\
+            height: auto;\
+            border-radius: 12px;\
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);\
+            border: 2px solid rgba(0, 212, 255, 0.3);\
+        \}\
+\
+        .image-container p \{\
+            margin-top: 10px;\
+            font-size: 0.9rem;\
+            color: #888;\
+            font-style: italic;\
+        \}\
+\
+        /* ===== FOOTER ===== */\
+        footer \{\
+            text-align: center;\
+            padding: 30px 0;\
+            margin-top: 40px;\
+            border-top: 2px solid rgba(255, 255, 255, 0.2);\
+        \}\
+\
+        footer p \{\
+            color: #888;\
+            font-size: 1rem;\
+        \}\
+\
+        footer .copyright \{\
+            margin-top: 15px;\
+            font-size: 0.9rem;\
+            color: #666;\
+        \}\
+    </style>\
+</head>\
+<body>\
+    <div class="overlay">\
+        <div class="container">\
+            \
+            <!-- HEADER WITH NAME -->\
+            <header>\
+                <h1>Rajiv Henry.</h1>\
+                <p>Cloud Wolf | Red Team | Explorer</p>\
+            </header>\
+\
+            <!-- SECTION 1: ABOUT ME -->\
+            <section class="section">\
+                <h2>About Me</h2>\
+                <p>Cloud security pays my child support .</p>\
+            </section>\
+\
+            <!-- EMBEDDED IMAGE -->\
+            <div class="image-container">\
+                <img src="https://plus.unsplash.com/premium_photo-1768396819768-0805d38cb1fb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">\
+                <p>The Light Within \'97 I like can fish</p>\
+            </div>\
+\
+            <!-- SECTION 2: PROJECT DESCRIPTION -->\
+            <section class="section">\
+                <h2>Project Description</h2>\
+                <p>This lab introduces Linux automation and cloud initialization by writing a startup script that configures an EC2 instance to host a front-facing static website.</p>\
+            </section>\
+\
+            <!-- SECTION 3: CONTACT -->\
+            <section class="section">\
+                <h2>Contact</h2>\
+                <p>Questions, collaborations, or inquiries? rajivmhenry@gmail.com.</p>\
+            </section>\
+\
+            <!-- FOOTER -->\
+            <footer>\
+                <p>&copy; 2026 EleMENTALS &mdash; Californian Rolls.</p>\
+            </footer>\
+\
+        </div>\
+    </div>\
+</body>\
+</html>\
+EOF}
